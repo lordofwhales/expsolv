@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "stack.h"
+#include "eval.h"
 using namespace std;
 
 #define INFIX 0
@@ -12,51 +13,14 @@ int glob_mode;
 string pre_to_pos(string exp);
 string inf_to_pos(string exp);
 int handle_expression(string exp) {
-	if(glob_mode==PREFIX) exp = pre_to_pos(exp);
-	if(glob_mode==INFIX) exp= inf_to_pos(exp);
-	stack<int> /*oper*/ands;
-	int current = 0;
-	bool num = false;
-	for(int i=0; i<strlen(exp.c_str()); i++) {
-		char c = exp[i];
-		if((c==' ' || c=='|')&&num) {
-			num = false;
-			ands.push(current);
-			current = 0;
-		} else if(string("1234567890").find(c)!=string::npos) {
-			current = current*10+(c-'0');
-			num = true;
-		} else if(string("+-*/^").find(c)!=string::npos) {
-			if(num) {
-				ands.push(current);
-				current = 0;
-				num = false;
-			}
-			if(ands.size()<2) {
-				cout << "Error: not enough operands for '"<<c<<"' at pos "<<i<<": " << ands << endl;
-				return 1;
-			}
-			int b = ands.pop();
-			int a = ands.pop();
-			switch(c) {
-				case '+' : ands.push(a+b); break;
-				case '-' : ands.push(a-b); break;
-				case '*' : ands.push(a*b); break;
-				case '/' : ands.push(a/b); break;
-				case '^' : 
-					int out = 1;
-					for(int i=0; i<b; i++) out*=a;
-					ands.push(out); break;
-			}
-		}
-	}
-    if(ands.size()==0) ands.push(0);
-	if(ands.size()!=1) {
-		cout << "Error: too many leftovers: "<<ands << endl;
-		return 1;
-	}
-	cout << ands.pop() << endl;
-	return 0;
+	if(glob_mode==PREFIX)
+		return eval_prefix(exp);
+	if(glob_mode==INFIX)
+		return eval_infix(exp);
+	if(glob_mode==POSTFIX)
+		return eval_postfix(exp);
+	cout << "Error: can't." << endl;
+	return 1;	
 }
 
 int main(int argc, char** argv) {
