@@ -1,6 +1,7 @@
 #include <iostream>
-#include "stack.h"
 #include <string.h>
+#include <stdio.h>
+#include "stack.h"
 using namespace std;
 
 #define INFIX 0
@@ -10,47 +11,6 @@ using namespace std;
 int glob_mode;
 string pre_to_pos(string exp);
 string inf_to_pos(string exp);
-int handle_expression(string exp);
-int main(int argc, char** argv) {
-	if(argc>1) {
-		string exp = "";
-		for(int i=0; i<argc; i++) {
-			char* arg = argv[i];
-			for(int i=0; i<strlen(arg); i++) {
-				char c = arg[i];
-				exp += c;
-				exp += " ";
-			}
-		}
-		return handle_expression(exp);
-	}
-	cout << "Input one expression in infix per line.  Type 'glob_mode' to switch between in/pre/post-fix." << endl;
-	cout << "Input a blank line to finish.  Supported operators: +-*/^ always, () in infix, | separates numbers in pre and postfix." << endl;
-	string input = "";
-	do {
-		cout << "> ";
-		getline(cin,input);
-		if(input=="") break;
-		if(input=="glob_mode") {
-			cout << "If the next line starts with 'i' you'll be in infix; 'pr' to prefix; 'po' to postfix." << endl;
-			cout << "Mode: ";
-			getline(cin,input);
-			if(!strncmp(input.c_str(),"i",1)) {
-				cout << "Now in infix glob_mode\n" << endl;
-				glob_mode = INFIX;
-			} else if(!strncmp(input.c_str(),"pr",2)) {
-				cout << "Now in prefix glob_mode\n" << endl;
-				glob_mode = PREFIX;
-			} else if(!strncmp(input.c_str(),"po",2)) {
-				cout << "Now in postfix glob_mode\n" << endl;
-				glob_mode = POSTFIX;
-			}
-		}
-		int out = handle_expression(input);
-		if(out!=0) return out;
-	} while(input!="");
-}
-
 int handle_expression(string exp) {
 	if(glob_mode==PREFIX) exp = pre_to_pos(exp);
 	if(glob_mode==INFIX) exp= inf_to_pos(exp);
@@ -59,8 +19,7 @@ int handle_expression(string exp) {
 	bool num = false;
 	for(int i=0; i<strlen(exp.c_str()); i++) {
 		char c = exp[i];
-		if(c==' ') continue;
-		else if(c=='|') {
+		if((c==' ' || c=='|')&&num) {
 			num = false;
 			ands.push(current);
 			current = 0;
@@ -74,7 +33,7 @@ int handle_expression(string exp) {
 				num = false;
 			}
 			if(ands.size()<2) {
-				cout << "Error: not enough operands: " << ands << endl;
+				cout << "Error: not enough operands for '"<<c<<"' at pos "<<i<<": " << ands << endl;
 				return 1;
 			}
 			int b = ands.pop();
@@ -91,6 +50,7 @@ int handle_expression(string exp) {
 			}
 		}
 	}
+    if(ands.size()==0) ands.push(0);
 	if(ands.size()!=1) {
 		cout << "Error: too many leftovers: "<<ands << endl;
 		return 1;
@@ -99,8 +59,50 @@ int handle_expression(string exp) {
 	return 0;
 }
 
+int main(int argc, char** argv) {
+	if(argc>1) {
+		string exp = "";
+		for(int i=0; i<argc; i++) {
+			char* arg = argv[i];
+			for(int i=0; i<strlen(arg); i++) {
+				char c = arg[i];
+				exp += c;
+				exp += " ";
+			}
+		}
+		return handle_expression(exp);
+	}
+	cout << "Input one expression in infix per line.  Type 'mode' to switch between in/pre/post-fix." << endl;
+	cout << "Input a blank line to finish.  Supported operators: +-*/^ always, () in infix, | or space separates numbers in pre and postfix." << endl;
+	string input = "";
+	do {
+		cout << "> ";
+		getline(cin,input);
+		if(input=="") break;
+		if(input=="mode") {
+			cout << "If the next line starts with 'i' you'll be in infix; 'pr' to prefix; 'po' to postfix." << endl;
+			cout << "Mode: ";
+			getline(cin,input);
+			if(!strncmp(input.c_str(),"i",1)) {
+				cout << "Now in infix mode\n" << endl;
+				glob_mode = INFIX;
+			} else if(!strncmp(input.c_str(),"pr",2)) {
+				cout << "Now in prefix mode\n" << endl;
+				glob_mode = PREFIX;
+			} else if(!strncmp(input.c_str(),"po",2)) {
+				cout << "Now in postfix mode\n" << endl;
+				glob_mode = POSTFIX;
+			}
+            continue;
+		}
+		int out = handle_expression(input);
+		if(out!=0) return out;
+	} while(input!="");
+}
+
+
 string pre_to_pos(string exp) {
-	return exp;
+    return exp;
 }
 
 string inf_to_pos(string exp) {
