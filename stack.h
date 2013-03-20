@@ -2,13 +2,15 @@
 #include <iostream>
 using namespace std;
 
+#define DEFAULT_ADJUST 5
+
 template <class T>
 class stack {
 	T *array;
 	int top;
 	public:
 		stack<T>() {
-			array = new T[5];
+			array = new T[DEFAULT_ADJUST];
 			top = -1;
 		}
 		void push(T item);
@@ -30,6 +32,7 @@ void stack<T>::push(T item) {
 
 template <class T>
 T stack<T>::peek() {
+	if(stack<T>::size()==0) return 0;
 	return stack<T>::array[stack<T>::size()-1];
 }
 
@@ -38,7 +41,7 @@ T stack<T>::pop() {
 	if(top==-1) return 0;
 	T out = stack<T>::array[stack<T>::size()-1];
 	stack<T>::top--;
-	if(stack<T>::get_true_size()-top>5) stack<T>::adjust(-5);
+	if(stack<T>::get_true_size()-top>DEFAULT_ADJUST) stack<T>::adjust(-DEFAULT_ADJUST);
 	return out;
 }
 
@@ -51,7 +54,7 @@ template <class T>
 int stack<T>::size() { return stack<T>::top+1; }
 
 template <class T>
-void stack<T>::adjust() { adjust(5); }
+void stack<T>::adjust() { adjust(DEFAULT_ADJUST); }
 
 template <class T>
 void stack<T>::adjust(const int amt) {

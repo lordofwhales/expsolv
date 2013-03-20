@@ -63,12 +63,3 @@ int main(int argc, char** argv) {
 		if(out!=0) return out;
 	} while(input!="");
 }
-
-
-string pre_to_pos(string exp) {
-    return exp;
-}
-
-string inf_to_pos(string exp) {
-	return exp;
-}
