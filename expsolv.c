@@ -26,12 +26,11 @@ int handle_expression(string exp) {
 int main(int argc, char** argv) {
 	if(argc>1) {
 		string exp = "";
-		for(int i=0; i<argc; i++) {
+		for(int i=1; i<argc; i++) {
 			char* arg = argv[i];
 			for(int i=0; i<strlen(arg); i++) {
 				char c = arg[i];
 				exp += c;
-				exp += " ";
 			}
 		}
 		return handle_expression(exp);

@@ -6,6 +6,15 @@
 #endif
 using namespace std;
 
+string charstr(stack<int> stk) {
+	string out("[");
+	for(int i=0; i<stk.size()-1; i++) {
+		out += char(stk[i]);
+		out += ", ";
+	} out+=char(stk.peek());
+	out += "]";
+	return out;
+}
 int get_result(int a, int b, char oper) {
 	switch(oper) {
 		case '+' : return a+b;
@@ -47,9 +56,11 @@ int eval_infix(string exp) {
 	int current = 0;
 	bool num = false;
 	int neg = 1;
+	bool lastnum = false;
 	for(int i=0; i<exp.size(); i++) {
 		char c = exp[i];
-		if(c=='-' && !num) {
+		if(c=='-' && !lastnum) {
+			if(ators.peek()==')') ators.pop();
 			neg = -1;
 			continue;
 		}
@@ -58,8 +69,11 @@ int eval_infix(string exp) {
 			ands.push(current);
 			current = 0;
 			if(c=='(') num = true;
+			if(c!=' ') lastnum = false;
+			neg = 1;
 		}
 		if(string("1234567890").find(c)!=string::npos) {
+			lastnum = true;
 			if(ators.peek()==')') {
 				ators.pop();
 				ators.push('*');
@@ -87,6 +101,7 @@ int eval_infix(string exp) {
 			}
 			ators.push(c);
 		} else if(c==')') {
+			lastnum = true;
 			if(ators.peek()==')') ators.pop();
 			char last = ators.peek();
 			while(last!='(') {
@@ -99,7 +114,7 @@ int eval_infix(string exp) {
 			ators.pop();
 			ators.push(c);
 		}
-		cout << "Presently on <" << c << ">: " << ands << ", " << ators << ", neg is " << neg << endl;
+		cout << "i:<"<<i<<"> c:<"<<c<<"> ands:<"<<ands<<"> ators:<"<<charstr(ators)<<"> neg:<"<<neg<<"> lastnum:<"<<lastnum<<">" << endl;
 	}
 	if(ators.peek()==')') ators.pop();
 	if(num) ands.push(current);
