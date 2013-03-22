@@ -56,10 +56,10 @@ int eval_infix(string exp) {
 	int current = 0;
 	bool num = false;
 	int neg = 1;
-	bool lastnum = false;
+	bool afterop = false;
 	for(int i=0; i<exp.size(); i++) {
 		char c = exp[i];
-		if(c=='-' && !lastnum) {
+		if(c=='-' && afterop) {
 			if(ators.peek()==')') ators.pop();
 			neg = -1;
 			continue;
@@ -68,12 +68,12 @@ int eval_infix(string exp) {
 			num = false;
 			ands.push(current);
 			current = 0;
-			if(c=='(') num = true;
-			if(c!=' ') lastnum = false;
+			if(c=='(' || c==')') num = true;
+			if(c!=' ' && c!=')') afterop = true;
 			neg = 1;
 		}
 		if(string("1234567890").find(c)!=string::npos) {
-			lastnum = true;
+			afterop = false;
 			if(ators.peek()==')') {
 				ators.pop();
 				ators.push('*');
@@ -81,6 +81,7 @@ int eval_infix(string exp) {
 			current = current*10 + neg*(c-'0');
 			num = true;
 		} else if(string("+-*/^").find(c)!=string::npos) {
+            afterop = true;
 			if(ators.peek()==')') ators.pop();
 			char last = ators.peek();
 			while(last>0 && precedence(last)>=precedence(c)) {
@@ -101,7 +102,7 @@ int eval_infix(string exp) {
 			}
 			ators.push(c);
 		} else if(c==')') {
-			lastnum = true;
+			afterop = false;
 			if(ators.peek()==')') ators.pop();
 			char last = ators.peek();
 			while(last!='(') {
@@ -114,7 +115,7 @@ int eval_infix(string exp) {
 			ators.pop();
 			ators.push(c);
 		}
-		cout << "i:<"<<i<<"> c:<"<<c<<"> ands:<"<<ands<<"> ators:<"<<charstr(ators)<<"> neg:<"<<neg<<"> lastnum:<"<<lastnum<<">" << endl;
+        printf("i: %2d   c: %c   ands: %10s   ators: %10s   neg: %2d   afterop: %d   current: %2d\n",i,c,ands.str(),charstr(ators).c_str(),neg,afterop,current);
 	}
 	if(ators.peek()==')') ators.pop();
 	if(num) ands.push(current);

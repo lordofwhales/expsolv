@@ -1,5 +1,6 @@
 #define STACKH
 #include <iostream>
+#include <sstream>
 using namespace std;
 
 #define DEFAULT_ADJUST 5
@@ -16,6 +17,7 @@ class stack {
 		void push(T item);
 		T pop();
 		T peek();
+        const char* str();
 		int size();
 		int &operator[](const int index) { return array[index]; }
 	private:
@@ -67,10 +69,19 @@ void stack<T>::adjust(const int amt) {
 
 template <class T>
 std::ostream &operator<<(std::ostream &strm, stack<T> stck) {
-	strm << "[";
-	for(int i=0; i<stck.size(); i++) {
-		strm << stck[i] << (i<stck.size()-1 ? ", " : "");
+    strm << stck.str();
+}
+
+template <class T>
+const char* stack<T>::str() {
+    stringstream strm(""); 
+    strm << "[";
+	for(int i=0; i<stack<T>::size(); i++) {
+		strm << stack<T>::array[i] << (i<stack<T>::size()-1 ? ", " : "");
 	}
 	strm << "]";
 	strm << '\0';
+    string out;
+    getline(strm,out);
+    return out.c_str();
 }
