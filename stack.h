@@ -9,12 +9,15 @@ template <class T>
 class stack {
 	T *array;
 	int top;
+    int t_size;
 	public:
 		stack<T>() {
 			array = new T[DEFAULT_ADJUST];
+            t_size = DEFAULT_ADJUST;
 			top = -1;
 		}
 		void push(T item);
+        void clear();
 		T pop();
 		T peek();
         const char* str();
@@ -28,7 +31,8 @@ class stack {
 
 template <class T>
 void stack<T>::push(T item) {
-	if(top==get_true_size()-1) adjust();
+    //cout << "Putting "<<item<<", top is "<<top<<", true_size is "<<get_true_size() << endl;
+	if(top==stack<T>::get_true_size()-1) adjust();
 	array[++top] = item;
 }
 
@@ -49,7 +53,7 @@ T stack<T>::pop() {
 
 template <class T>
 int stack<T>::get_true_size() {
-	return sizeof(stack<T>::array)/sizeof(stack<T>::array[0]);
+    return t_size;
 }
 
 template <class T>
@@ -59,12 +63,13 @@ template <class T>
 void stack<T>::adjust() { adjust(DEFAULT_ADJUST); }
 
 template <class T>
-void stack<T>::adjust(const int amt) {
+void stack<T>::adjust(int amt) {
 	T *newarr = new T[stack<T>::get_true_size()+amt];
 	for(int i=0; i<min(get_true_size(),get_true_size()+amt); i++) {
 		newarr[i] = stack<T>::array[i];
 	}
 	stack<T>::array = newarr;
+    t_size += amt;
 }
 
 template <class T>
