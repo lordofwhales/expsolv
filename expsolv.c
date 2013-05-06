@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string.h>
 #include <stdio.h>
-#include "stack.h"
+#include "newstack.h"
 #include "eval.h"
 using namespace std;
 

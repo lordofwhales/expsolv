@@ -2,7 +2,7 @@
 using namespace std;
 
 #ifndef STACKH
-#include "stack.h"
+#include "newstack.h"
 #endif
 
 int main() {
