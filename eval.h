@@ -7,7 +7,6 @@
 using namespace std;
 
 string charstr(stack<int> stk) {
-    cout << "charstr " << stk << endl;
 	string out("[");
 	for(int i=0; i<stk.size()-1; i++) {
 		out += char(stk[i]);
@@ -28,7 +27,6 @@ int naive_power(int a, int b) {
     return out;
 }
 int get_result(int a, int b, char oper) {
-    cout << "get_result "<<a<<" "<<b<<" "<<oper<<endl;
 	switch(oper) {
 		case '+' : return a+b;
 		case '-' : return a-b;
@@ -50,7 +48,6 @@ int get_result(int a, int b, char oper) {
 }
 
 int precedence(char c) {
-    cout << "precedence " << c << endl;
 	switch(c) {
 		case '+': case '-': return 0;
 		case '*': case '/': return 1;
@@ -60,7 +57,6 @@ int precedence(char c) {
 	return 0;
 }
 int eval_infix(string exp) {
-    cout << "eval_infix " << exp << endl;
 	int open=0, close=0;
 	for(int i=0; i<exp.size(); i++) {
 		if(exp[i]=='(') open++;
@@ -72,12 +68,14 @@ int eval_infix(string exp) {
 	}
 	stack<int> /*oper*/ators;
 	stack<int> /*oper*/ands;
-    cout << "made stacks" << endl;
 	int current = 0;
 	bool num = false;
 	int neg = 1;
 	bool afterop = false;
 	for(int i=0; i<exp.size(); i++) {
+        cout << "startloop ";
+        cout << "ators: " << ators << endl;
+        cout << "ands:  " << ands << endl;
 		char c = exp[i];
         cout << i << "/" << c << endl;
 		if(c=='-' && afterop) {
@@ -93,6 +91,7 @@ int eval_infix(string exp) {
 		if(string("+-*/^() ").find(c)!=string::npos && num) {
 			num = false;
 			ands.push(current);
+            cout << "bllll" << ands << ands.size() << endl;
 			current = 0;
 			if(c=='(') num = true;
 			neg = 1;
@@ -103,21 +102,14 @@ int eval_infix(string exp) {
         }
         if(string("+-*/^(").find(c)!=string::npos && c!=' ' && c!=')') afterop = true;
 		if(string("1234567890").find(c)!=string::npos) {
-            cout << "nermber" << endl;
 			afterop = false;
             ators.peek();
-            cout << "peek'd" << endl;
 			if(ators.peek()==')') {
-                cout << "peeked a paren" << endl;
 				ators.pop();
-                cout << "popped a paren" << endl;
 				ators.push('*');
-                cout << "pushed a star" << endl;
 			}
 			current = current*10 + neg*(c-'0');
-            cout << "currented" << endl;
 			num = true;
-            cout << "donenermber" << endl;
 		} else if(string("+-*/^").find(c)!=string::npos) {
             afterop = true;
 			if(ators.peek()==')') ators.pop();
@@ -154,15 +146,27 @@ int eval_infix(string exp) {
 			ators.push(c);
 		}
         cout << "preprintf" << endl;
+        cout << "ands: " << endl;
+        cout << ands.str() << endl;
         printf("i: %2d   c: %c   ands: %10s   ators: %10s   neg: %2d   afterop: %d   current: %2d\n",i,c,ands.str(),charstr(ators).c_str(),neg,afterop,current);
+        cout << "postprintf" << endl;
 	}
+    cout << "/1" << endl;
 	if(ators.peek()==')') ators.pop();
+    cout << "/2" << endl;
 	if(num) ands.push(current);
+    cout << "/3" << endl;
+    cout << ators << ators.size() << endl;
 	while(ators.size()>0) {
+        cout << "/4" << endl;
 		int b = ands.pop();
+        cout << "/5" << endl;
 		int a = ands.pop();
+        cout << "/6" << endl;
 		ands.push(get_result(a,b,ators.pop()));
+        cout << "/7" << endl;
 	}
+    cout << "/8" << endl;
 	cout << ands.pop() << endl;
 	return 0;
 }
